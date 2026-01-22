@@ -1,0 +1,102 @@
+{
+    "Parent": "Potion_Empty",
+    "TranslationProperties": {
+        "Name": "Empty Flask",
+        "Description": "An empty flask that can be filled with water"
+    },
+    "HeldScale": 0.35,
+    "MaxStack": 16,
+    "Categories": [
+        "Items.Survival"
+    ],
+    "Recipe": {
+        "TimeSeconds": 1.5,
+        "Input": [
+            {
+                "ResourceTypeId": "Sands",
+                "Quantity": 2
+            }
+        ],
+        "BenchRequirement": [
+            {
+                "Type": "Crafting",
+                "Categories": [
+                    "Workbench_Survival"
+                ],
+                "Id": "Workbench"
+            }
+        ],
+        "OutputQuantity": 1
+    },
+    "Interactions": {
+        "Primary": "Block_Primary",
+        "Secondary": {
+            "Interactions": [
+                {
+                    "Type": "RefillContainer",
+                    "Effects": {
+                        "ClearSoundEventOnFinish": true,
+                        "LocalSoundEventId": "SFX_Water_MoveIn"
+                    },
+                    "States": {
+                        "Filled_Water": {
+                            "AllowedFluids": [
+                                "Water_Source",
+                                "Water"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "State": {
+        "Filled_Water": {
+            "Variant": true,
+            "TranslationProperties": {
+                "Name": "Water Flask",
+                "Description": "A flask filled with fresh water. Drink to restore hunger."
+            },
+            "Icon": "Icons/ItemsGenerated/Potion_Mana.png",
+            "Consumable": true,
+            "MaxDurability": 10,
+            "MaxStack": 1,
+            "Parent": "Potion_Mana",
+            "Interactions": {
+                "Secondary": {
+                    "Interactions": [
+                        {
+                            "Type": "Charging",
+                            "FailOnDamage": true,
+                            "Effects": {
+                                "ItemAnimationId": "Consume",
+                                "ClearAnimationOnFinish": true,
+                                "LocalSoundEventId": "SFX_Health_Potion_High_Drink"
+                            },
+                            "HorizontalSpeedMultiplier": 0.5,
+                            "Next": {
+                                "1.5": {
+                                    "Type": "Serial",
+                                    "Interactions": [
+                                        {
+                                            "Type": "ModifyInventory",
+                                            "AdjustHeldItemDurability": -1,
+                                            "BrokenItem": "EasyHunger_Flask_Empty"
+                                        },
+                                        {
+                                            "Type": "EasyHunger_DrinkWater",
+                                            "ThirstRestoreAmount": 10.0
+                                        }
+                                    ]
+                                }
+                            },
+                            "Failed": {
+                                "Type": "Simple"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

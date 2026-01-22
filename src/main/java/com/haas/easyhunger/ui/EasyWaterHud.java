@@ -1,0 +1,108 @@
+package com.haas.easyhunger.ui;
+
+import com.hypixel.hytale.protocol.GameMode;
+import com.hypixel.hytale.server.core.entity.entities.player.hud.CustomUIHud;
+import com.hypixel.hytale.server.core.ui.Anchor;
+import com.hypixel.hytale.server.core.ui.Value;
+import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.haas.easyhunger.EasyHunger;
+import com.haas.easyhunger.components.ThirstComponent;
+import com.haas.easyhunger.config.EasyHungerConfig;
+import com.haas.easyhunger.config.HudPosition;
+import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
+
+import java.util.WeakHashMap;
+
+public class EasyWaterHud extends CustomUIHud {
+    static private final WeakHashMap<PlayerRef, EasyWaterHud> hudMap = new WeakHashMap<>();
+    static public final String hudIdentifier = "com.haas.easyhunger.hud.water";
+    private GameMode gameMode;
+    private float thirstLevel;
+
+    public EasyWaterHud(@NonNullDecl PlayerRef playerRef, GameMode gameMode, float thirstLevel) {
+        super(playerRef);
+        this.gameMode = gameMode;
+        this.thirstLevel = thirstLevel;
+        hudMap.put(playerRef, this);
+    }
+
+    @Override
+    protected void build(@NonNullDecl UICommandBuilder uiCommandBuilder) {
+        EasyHungerConfig config = EasyHunger.get().getConfig();
+        HudPosition hudPosition = config.getHudPosition();
+        uiCommandBuilder.append("HUD/Hunger/Water.ui");
+        updateHudPosition(uiCommandBuilder, hudPosition);
+        updateGameMode(uiCommandBuilder, this.gameMode);
+        updateThirstLevel(uiCommandBuilder, this.thirstLevel);
+    }
+
+    protected void updateHudPosition(UICommandBuilder uiCommandBuilder, HudPosition hudPosition) {
+        int DefaultItemSlotSize = 74;
+        int DefaultItemSlotsPerRow = 9;
+        int DefaultItemGridPadding = 2;
+        int HotbarSlotSpacingHud = 4;
+        
+        int HotbarHeight = DefaultItemSlotSize + (2 * DefaultItemGridPadding);
+        int HotbarWidthHud = (DefaultItemSlotSize * DefaultItemSlotsPerRow) + (HotbarSlotSpacingHud * DefaultItemSlotsPerRow);
+
+        int BottomMargin = 30;
+        int ContainerMargin = 6;
+        int InventoryClosedContainerMargin = BottomMargin + ContainerMargin;
+        
+        int calculatedBottomOffset = InventoryClosedContainerMargin + HotbarHeight + 6;
+
+        // Offset for Water Bar to be ABOVE Hunger Bar
+        // Assuming Hunger Bar height is 12 + some padding.
+        int STACK_OFFSET = 14; 
+
+        Anchor anchor = new Anchor();
+        
+        switch (hudPosition) {
+            case TOP:
+                 anchor.setWidth(Value.of(HotbarWidthHud));
+                 anchor.setBottom(Value.of(InventoryClosedContainerMargin + HotbarHeight + 32));
+                 break;
+            case BOTTOM:
+                anchor.setWidth(Value.of(HotbarWidthHud));
+                anchor.setBottom(Value.of(4));
+                break;
+        }
+
+        uiCommandBuilder.setObject("#EasyWaterContainer.Anchor", anchor);
+    }
+
+    protected void updateThirstLevel(UICommandBuilder uiCommandBuilder, float thirstLevel) {
+        this.thirstLevel = thirstLevel;
+        float max = EasyHunger.get().getConfig().getMaxThirst();
+        float barValue = thirstLevel / max;
+        uiCommandBuilder.set("#EasyWaterThirstBar.Value", barValue);
+        uiCommandBuilder.set("#EasyWaterCreativeThirstBar.Value", barValue);
+        uiCommandBuilder.set("#EasyWaterProgressBarEffect.Value", barValue);
+    }
+
+    protected void updateGameMode(UICommandBuilder uiCommandBuilder, GameMode gameMode) {
+        this.gameMode = gameMode;
+        String iconBackground = gameMode == GameMode.Adventure
+            ? "HUD/Hunger/WaterIcon.png"
+            : "HUD/Hunger/CreativeWaterIcon.png";
+        uiCommandBuilder.set("#EasyWaterIcon.Background", iconBackground);
+        uiCommandBuilder.set("#EasyWaterThirstBar.Visible", gameMode == GameMode.Adventure);
+        uiCommandBuilder.set("#EasyWaterCreativeThirstBar.Visible", gameMode == GameMode.Creative);
+    }
+
+    static public void updatePlayerThirstLevel(@NonNullDecl PlayerRef playerRef, float thirstLevel) {
+        EasyWaterHud hud = hudMap.get(playerRef);
+        if (hud == null) return;
+        UICommandBuilder uiCommandBuilder = new UICommandBuilder();
+        hud.updateThirstLevel(uiCommandBuilder, thirstLevel);
+        hud.update(false, uiCommandBuilder);
+    }
+    static public void updatePlayerGameMode(@NonNullDecl PlayerRef playerRef, GameMode gameMode) {
+        EasyWaterHud hud = hudMap.get(playerRef);
+        if (hud == null) return;
+        UICommandBuilder uiCommandBuilder = new UICommandBuilder();
+        hud.updateGameMode(uiCommandBuilder, gameMode);
+        hud.update(false, uiCommandBuilder);
+    }
+}

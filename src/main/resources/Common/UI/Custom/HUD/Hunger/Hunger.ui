@@ -1,0 +1,35 @@
+﻿@EasyHungerAdventureBarFill = "HungerBarFill.png";
+@EasyHungerCreativeBarFill = "CreativeHungerBarFill.png";
+
+Group {
+    LayoutMode: Bottom;
+
+    Group #EasyHungerContainer {
+        LayoutMode: Right;
+        
+        Group {
+            Anchor: (Width: 318, Height: 12);
+            Background: "HungerBackground.png";
+
+            ProgressBar #EasyHungerHungerBar {
+                Anchor: (Width: 318, Height: 12);
+                BarTexturePath: @EasyHungerAdventureBarFill;
+                Visible: true;
+            }
+            ProgressBar #EasyHungerCreativeHungerBar {
+                Anchor: (Width: 318, Height: 12);
+                BarTexturePath: @EasyHungerCreativeBarFill;
+                Visible: false;
+            }
+             ProgressBar #EasyHungerProgressBarEffect {
+                Anchor: (Width: 318, Height: 12);
+                BarTexturePath: "HungerBarEffect.png";
+            }
+        }
+
+        Group #EasyHungerIcon {
+            Anchor: (Width: 24, Height: 24, Left: 4, Top: -8);
+            Background: "HungerIcon.png";
+        }
+    }
+}

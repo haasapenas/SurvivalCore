@@ -1,0 +1,92 @@
+package com.haas.easyhunger.interactions;
+
+import com.haas.easyhunger.EasyHunger;
+import com.haas.easyhunger.components.HungerComponent;
+import com.haas.easyhunger.ui.EasyHungerHud;
+
+import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.KeyedCodec;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.protocol.InteractionState;
+import com.hypixel.hytale.protocol.InteractionType;
+import com.hypixel.hytale.server.core.entity.InteractionContext;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+
+import javax.annotation.Nonnull;
+
+public class ConsumeFoodInteraction extends SimpleInstantInteraction {
+    
+    private float hungerRestoreAmount = 10.0f;
+    
+    public static final BuilderCodec<ConsumeFoodInteraction> CODEC = 
+        ((BuilderCodec.Builder<ConsumeFoodInteraction>) BuilderCodec.builder(
+            ConsumeFoodInteraction.class, 
+            ConsumeFoodInteraction::new,
+            SimpleInstantInteraction.CODEC)
+            .append(new KeyedCodec<>("HungerRestoreAmount", Codec.FLOAT), 
+                (interaction, value) -> interaction.hungerRestoreAmount = value, 
+                interaction -> interaction.hungerRestoreAmount)
+            .add()
+        ).build();
+    
+    public ConsumeFoodInteraction() {
+        super();
+    }
+    
+    @Override
+    protected void firstRun(@Nonnull InteractionType type, 
+                           @Nonnull InteractionContext context, 
+                           @Nonnull CooldownHandler cooldownHandler) {
+        try {
+            Ref<EntityStore> entityRef = context.getEntity();
+            if (entityRef == null || !entityRef.isValid()) {
+                context.getState().state = InteractionState.Failed;
+                return;
+            }
+            
+            Store<EntityStore> store = entityRef.getStore();
+            PlayerRef playerRef = store.getComponent(entityRef, PlayerRef.getComponentType());
+            
+            if (playerRef == null) {
+                context.getState().state = InteractionState.Failed;
+                return;
+            }
+            
+            HungerComponent hunger = store.getComponent(entityRef, HungerComponent.getComponentType());
+            
+            if (hunger != null) {
+                float max = EasyHunger.get().getConfig().getMaxHunger();
+                if (hunger.getHungerLevel() < max) {
+                    // Get item ID from context
+                    String itemId = "unknown";
+                    com.hypixel.hytale.server.core.inventory.ItemStack heldItem = context.getHeldItem();
+                    if (heldItem != null) {
+                        itemId = heldItem.getItemId();
+                    }
+                    
+                    // Check config for this item's value, fallback to JSON value
+                    float restoreAmount = EasyHunger.get().getConfig().getFoodValue(itemId);
+                    if (restoreAmount <= 0) {
+                        restoreAmount = this.hungerRestoreAmount;
+                    }
+                    
+                    hunger.feed(restoreAmount);
+                    
+                    // Update HUD
+                    EasyHungerHud.updatePlayerHungerLevel(playerRef, hunger.getHungerLevel());
+                }
+            }
+            
+            context.getState().state = InteractionState.Finished;
+            
+        } catch (Exception e) {
+            EasyHunger.logInfo("CONSUME FOOD ERROR: " + e.toString());
+            context.getState().state = InteractionState.Failed;
+        }
+    }
+}
