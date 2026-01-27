@@ -1,0 +1,69 @@
+﻿plugins {
+    id("java")
+}
+
+group = "Haas"
+version = "1.0.9"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly(fileTree("libs") { include("*.jar") })
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+/**
+ * Generate manifest.json content as a generated resource
+ * using Gradle's group/name/version before every build/processResources.
+ */
+val generatedResourcesDir: Provider<Directory> = layout.buildDirectory.dir("generated/resources/main")
+
+val generateManifest by tasks.registering {
+    val outFile = generatedResourcesDir.map { it.file("manifest.json") }
+
+    // Regenerate if any of these change
+    inputs.property("group", project.group.toString())
+    inputs.property("name", rootProject.name)
+    inputs.property("version", project.version.toString())
+
+    outputs.file(outFile)
+
+    doLast {
+        val f = outFile.get().asFile
+        f.parentFile.mkdirs()
+
+        val json = """
+            {
+              "Group": "${project.group}",
+              "Name": "${rootProject.name}",
+              "Version": "${project.version}",
+              "Main": "com.haas.easyhunger.EasyHunger",
+              "IncludesAssetPack": true
+            }
+        """.trimIndent() + "\n"
+
+        f.writeText(json, Charsets.UTF_8)
+    }
+}
+
+// Make Gradle include the generated resources directory in the main resources
+sourceSets {
+    named("main") {
+        resources.srcDir(generatedResourcesDir)
+    }
+}
+
+// Ensure it's generated before resources are packaged (build/jar/run/etc.)
+tasks.named<ProcessResources>("processResources") {
+    dependsOn(generateManifest)
+}
+
+
