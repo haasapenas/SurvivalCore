@@ -2,8 +2,6 @@
 
 A survival mod for Hytale that adds **Hunger** and **Thirst** systems, requiring players to manage their food and water intake to survive.
 
-Originally based on [Hungry by xcm](https://www.curseforge.com/hytale/mods/hungry), with significant expansions and new features.
-
 ## Features
 
 ### Hunger System
