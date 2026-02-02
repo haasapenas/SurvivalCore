@@ -1,5 +1,5 @@
 {
-    "Parent": "Potion_Empty",
+    "Parent": "EasyHunger_Template_Waterskin",
     "TranslationProperties": {
         "Name": "Empty Waterskin",
         "Description": "A leather waterskin that can be filled with water"
@@ -29,7 +29,6 @@
             -2
         ]
     },
-    "HeldScale": 1.0,
     "MaxStack": 8,
     "Categories": [
         "Items.Survival"
@@ -108,7 +107,6 @@
             "Consumable": true,
             "MaxDurability": 10,
             "MaxStack": 1,
-            "Scale": 2,
             "PlayerAnimationsId": {
                 "Parent": "Item",
                 "Animations": {

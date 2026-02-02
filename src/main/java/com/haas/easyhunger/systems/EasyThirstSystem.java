@@ -109,6 +109,12 @@ public class EasyThirstSystem extends EntityTickingSystem<EntityStore> {
             return;
         }
         
+        // Check if player is sleeping (pause thirst while in bed)
+        if (EasyHunger.get().getConfig().isPauseWhileSleeping() 
+            && com.haas.easyhunger.utils.SleepUtils.isSleeping(index, archetypeChunk)) {
+            return;
+        }
+        
         // Apply biome multiplier to thirst decay
         float biomeMultiplier = 1.0f;
         Player player = archetypeChunk.getComponent(index, Player.getComponentType());

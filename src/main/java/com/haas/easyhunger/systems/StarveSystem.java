@@ -110,6 +110,12 @@ public class StarveSystem extends EntityTickingSystem<EntityStore> {
             return;
         }
         
+        // Check if player is sleeping (pause hunger while in bed)
+        if (EasyHunger.get().getConfig().isPauseWhileSleeping() 
+            && com.haas.easyhunger.utils.SleepUtils.isSleeping(index, archetypeChunk)) {
+            return;
+        }
+        
         float staminaModifier = ((10.0f - lowestStaminaSeen) / 10.0f) * this.starvationStaminaModifier;
         
         // Apply biome multiplier

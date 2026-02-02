@@ -35,6 +35,7 @@ public class EasyHungerConfig {
     private static final KeyedCodec<Map<String, Float>> FOOD_VALUES = new KeyedCodec<>("FoodValues", new MapCodec<>(Codec.FLOAT, HashMap::new));
     private static final KeyedCodec<Map<String, Float>> DRINK_VALUES = new KeyedCodec<>("DrinkValues", new MapCodec<>(Codec.FLOAT, HashMap::new));
     private static final KeyedCodec<Float> THIRST_DAMAGE = new KeyedCodec<>("ThirstDamage", Codec.FLOAT);
+    private static final KeyedCodec<Boolean> PAUSE_WHILE_SLEEPING = new KeyedCodec<>("PauseWhileSleeping", Codec.BOOLEAN);
 
 
     public static final BuilderCodec<EasyHungerConfig> CODEC = BuilderCodec.builder(EasyHungerConfig.class, EasyHungerConfig::new)
@@ -64,6 +65,9 @@ public class EasyHungerConfig {
             
             // === DRINK VALUES ===
             .addField(DRINK_VALUES, (c, v) -> c.drinkValues = v, EasyHungerConfig::getDrinkValues)
+            
+            // === SLEEP PAUSE ===
+            .addField(PAUSE_WHILE_SLEEPING, (c, v) -> c.pauseWhileSleeping = v, EasyHungerConfig::isPauseWhileSleeping)
             .build();
 
     private Integer maxHunger = 50;
@@ -86,6 +90,7 @@ public class EasyHungerConfig {
     private float thirstDecayRate = 0.05f; // Slower than hunger? Or same.
     private float sprintThirstMultiplier = 1.5f;
     private float thirstyThreshold = 20.0f; // Same as hungryThreshold
+    private boolean pauseWhileSleeping = true; // Pause hunger/thirst while sleeping
     
     // Internal map for lookups
     private Map<String, Float> foodValues;
@@ -189,6 +194,7 @@ public class EasyHungerConfig {
     public float getThirstDecayRate() { return thirstDecayRate; }
     public float getSprintThirstMultiplier() { return sprintThirstMultiplier; }
     public float getThirstyThreshold() { return thirstyThreshold; }
+    public boolean isPauseWhileSleeping() { return pauseWhileSleeping; }
     
     // Food getters/setters/logic
     public Map<String, Float> getFoodValues() { return foodValues; }
