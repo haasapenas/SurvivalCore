@@ -30,10 +30,7 @@ public class EasyHungerConfig {
     private static final KeyedCodec<Float> SPRINT_THIRST_MULTIPLIER = new KeyedCodec<>("SprintThirstMultiplier", Codec.FLOAT);
     private static final KeyedCodec<Float> THIRSTY_THRESHOLD = new KeyedCodec<>("ThirstyThreshold", Codec.FLOAT);
 
-    // Food values (alphabetical order) for individual override support
-    // Dynamic Food Values Map
-    private static final KeyedCodec<Map<String, Float>> FOOD_VALUES = new KeyedCodec<>("FoodValues", new MapCodec<>(Codec.FLOAT, HashMap::new));
-    private static final KeyedCodec<Map<String, Float>> DRINK_VALUES = new KeyedCodec<>("DrinkValues", new MapCodec<>(Codec.FLOAT, HashMap::new));
+
     private static final KeyedCodec<Float> THIRST_DAMAGE = new KeyedCodec<>("ThirstDamage", Codec.FLOAT);
     private static final KeyedCodec<Boolean> PAUSE_WHILE_SLEEPING = new KeyedCodec<>("PauseWhileSleeping", Codec.BOOLEAN);
 
@@ -59,12 +56,7 @@ public class EasyHungerConfig {
             
             // === HUD POSITION ===
             .addField(HUD_POSITION, (c, v) -> c.hudPosition = HudPosition.valueOf(v), c -> c.getHudPosition().name())
-            
-            // === FOOD VALUES ===
-            .addField(FOOD_VALUES, (c, v) -> c.foodValues = v, EasyHungerConfig::getFoodValues)
-            
-            // === DRINK VALUES ===
-            .addField(DRINK_VALUES, (c, v) -> c.drinkValues = v, EasyHungerConfig::getDrinkValues)
+
             
             // === SLEEP PAUSE ===
             .addField(PAUSE_WHILE_SLEEPING, (c, v) -> c.pauseWhileSleeping = v, EasyHungerConfig::isPauseWhileSleeping)
@@ -91,75 +83,9 @@ public class EasyHungerConfig {
     private float sprintThirstMultiplier = 1.5f;
     private float thirstyThreshold = 20.0f; // Same as hungryThreshold
     private boolean pauseWhileSleeping = true; // Pause hunger/thirst while sleeping
-    
-    // Internal map for lookups
-    private Map<String, Float> foodValues;
-    private Map<String, Float> drinkValues;
+
 
     public EasyHungerConfig() {
-        foodValues = new HashMap<>();
-        // Default values
-        foodValues.put("Food_Beef_Raw", 3.75f);
-        foodValues.put("Food_Bread", 5.5f);
-        foodValues.put("Food_Candy_Cane", 2.25f);
-        foodValues.put("Food_Cheese", 4.75f);
-        foodValues.put("Food_Chicken_Raw", 2.75f);
-        foodValues.put("Food_Egg", 1.75f);
-        foodValues.put("Food_Fish_Grilled", 9.5f);
-        foodValues.put("Food_Fish_Raw", 2.5f);
-        foodValues.put("Food_Fish_Raw_Epic", 7.5f);
-        foodValues.put("Food_Fish_Raw_Legendary", 10.25f);
-        foodValues.put("Food_Fish_Raw_Rare", 5.25f);
-        foodValues.put("Food_Fish_Raw_Uncommon", 3.75f);
-        foodValues.put("Food_Kebab_Fruit", 7.5f);
-        foodValues.put("Food_Kebab_Meat", 14.5f);
-        foodValues.put("Food_Kebab_Mushroom", 9.75f);
-        foodValues.put("Food_Kebab_Vegetable", 9.25f);
-        foodValues.put("Food_Pie_Apple", 13.75f);
-        foodValues.put("Food_Pie_Meat", 18.5f);
-        foodValues.put("Food_Pie_Pumpkin", 15.25f);
-        foodValues.put("Food_Popcorn", 1.5f);
-        foodValues.put("Food_Pork_Raw", 3.5f);
-        foodValues.put("Food_Salad_Berry", 5.75f);
-        foodValues.put("Food_Salad_Caesar", 7.75f);
-        foodValues.put("Food_Salad_Mushroom", 6.5f);
-        foodValues.put("Food_Vegetable_Cooked", 7.25f);
-        foodValues.put("Food_Wildmeat_Cooked", 11.5f);
-        foodValues.put("Food_Wildmeat_Raw", 3.25f);
-        foodValues.put("Halloween_Basket_Pumpkin", 14.75f);
-        foodValues.put("Halloween_Basket_Straw", 11.5f);
-        foodValues.put("Ingredient_Dough", 0.75f);
-        foodValues.put("Ingredient_Flour", 0.5f);
-        foodValues.put("Ingredient_Salt", 0.0f);
-        foodValues.put("Ingredient_Spices", 0.0f);
-        foodValues.put("Plant_Crop_Aubergine_Item", 2.0f);
-        foodValues.put("Plant_Crop_Carrot_Item", 1.75f);
-        foodValues.put("Plant_Crop_Cauliflower_Item", 2.25f);
-        foodValues.put("Plant_Crop_Chilli_Item", 1.75f);
-        foodValues.put("Plant_Crop_Corn_Item", 2.75f);
-        foodValues.put("Plant_Crop_Lettuce_Item", 1.25f);
-        foodValues.put("Plant_Crop_Onion_Item", 0.75f);
-        foodValues.put("Plant_Crop_Potato_Item", 2.25f);
-        foodValues.put("Plant_Crop_Pumpkin_Item", 3.5f);
-        foodValues.put("Plant_Crop_Rice_Item", 1.5f);
-        foodValues.put("Plant_Crop_Tomato_Item", 1.5f);
-        foodValues.put("Plant_Crop_Turnip_Item", 1.75f);
-        foodValues.put("Plant_Fruit_Apple", 3.5f);
-        foodValues.put("Plant_Fruit_Azure", 2.75f);
-        foodValues.put("Plant_Fruit_Berries_Red", 1.75f);
-        foodValues.put("Plant_Fruit_Coconut", 3.75f);
-        foodValues.put("Plant_Fruit_Mango", 3.75f);
-        foodValues.put("Plant_Fruit_Pinkberry", 2.5f);
-        foodValues.put("Plant_Fruit_Poison", 2.25f);
-        foodValues.put("Plant_Fruit_Spiral", 2.75f);
-        foodValues.put("Plant_Fruit_Windwillow", 2.5f);
-        
-        // Default drink values (thirst restoration)
-        // Short prefixes work - getDrinkValue uses startsWith matching
-        drinkValues = new HashMap<>();
-        drinkValues.put("EasyHunger_Odre", 15.0f);
-        drinkValues.put("EasyHunger_WaterBowl", 5.0f);
-        drinkValues.put("Container_Bucket", 10.0f);
     }
 
     public float getStarvationTickRate() {
@@ -195,42 +121,7 @@ public class EasyHungerConfig {
     public float getSprintThirstMultiplier() { return sprintThirstMultiplier; }
     public float getThirstyThreshold() { return thirstyThreshold; }
     public boolean isPauseWhileSleeping() { return pauseWhileSleeping; }
-    
-    // Food getters/setters/logic
-    public Map<String, Float> getFoodValues() { return foodValues; }
-    
-    public Float getFoodValue(String foodId) {
-        Float value = foodValues.get(foodId);
-        return value != null ? value : 0.0f;
-    }
-    
-    public void setFoodValue(String foodId, float value) {
-        foodValues.put(foodId, value);
-    }
-    
-    // Drink getters/setters/logic
-    public Map<String, Float> getDrinkValues() { return drinkValues; }
-    
-    public Float getDrinkValue(String drinkId) {
-        // First try exact match
-        Float value = drinkValues.get(drinkId);
-        if (value != null && value > 0) {
-            return value;
-        }
-        
-        // Then try partial match (config key is prefix of actual ID)
-        for (java.util.Map.Entry<String, Float> entry : drinkValues.entrySet()) {
-            if (drinkId != null && drinkId.startsWith(entry.getKey())) {
-                return entry.getValue();
-            }
-        }
-        
-        return 0.0f;
-    }
-    
-    public void setDrinkValue(String drinkId, float value) {
-        drinkValues.put(drinkId, value);
-    }
+
 }
 
 

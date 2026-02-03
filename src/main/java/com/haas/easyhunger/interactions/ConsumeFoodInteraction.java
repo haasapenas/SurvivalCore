@@ -70,7 +70,7 @@ public class ConsumeFoodInteraction extends SimpleInstantInteraction {
                     }
                     
                     // Check config for this item's value, fallback to JSON value
-                    float restoreAmount = EasyHunger.get().getConfig().getFoodValue(itemId);
+                    float restoreAmount = EasyHunger.get().getFoodsConfig().getFoodValue(itemId);
                     if (restoreAmount <= 0) {
                         restoreAmount = this.hungerRestoreAmount;
                     }

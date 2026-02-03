@@ -69,7 +69,7 @@ public class EasyThirstHandler {
                 }
                 
                 // Lookup drink value from config - only restore if configured
-                Float drinkValue = EasyHunger.get().getConfig().getDrinkValue(itemId);
+                Float drinkValue = EasyHunger.get().getDrinksConfig().getDrinkValue(itemId);
                 
                 // Skip EasyHunger items - they use EasyHunger_DrinkWater interaction which already handles thirst
                 if (itemId != null && itemId.startsWith("EasyHunger_")) {

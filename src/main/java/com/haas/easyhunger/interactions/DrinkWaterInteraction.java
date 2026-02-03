@@ -73,7 +73,7 @@ public class DrinkWaterInteraction extends SimpleInstantInteraction {
                         if (itemId != null && itemId.startsWith("*")) {
                             itemId = itemId.substring(1);
                         }
-                        Float configValue = EasyHunger.get().getConfig().getDrinkValue(itemId);
+                        Float configValue = EasyHunger.get().getDrinksConfig().getDrinkValue(itemId);
                         if (configValue > 0) {
                             restoreAmount = configValue;
                         }

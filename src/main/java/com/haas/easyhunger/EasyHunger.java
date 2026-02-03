@@ -12,6 +12,8 @@ import com.hypixel.hytale.server.core.util.Config;
 import com.haas.easyhunger.commands.SetHungerCommand;
 import com.haas.easyhunger.components.HungerComponent;
 import com.haas.easyhunger.config.EasyHungerConfig;
+import com.haas.easyhunger.config.FoodsConfig;
+import com.haas.easyhunger.config.DrinksConfig;
 import com.haas.easyhunger.config.BiomeModifiersConfig;
 import com.haas.easyhunger.events.GameModeChangeListener;
 import com.haas.easyhunger.events.EasyHungerPlayerReady;
@@ -24,6 +26,8 @@ import java.util.logging.Level;
 public class EasyHunger extends JavaPlugin {
     private static EasyHunger instance;
     private final Config<EasyHungerConfig> config;
+    private final Config<FoodsConfig> foodsConfig;
+    private final Config<DrinksConfig> drinksConfig;
     private final Config<BiomeModifiersConfig> biomeConfig;
     private ComponentType<EntityStore, HungerComponent> hungerComponentType;
     private ComponentType<EntityStore, com.haas.easyhunger.components.ThirstComponent> thirstComponentType;
@@ -34,6 +38,8 @@ public class EasyHunger extends JavaPlugin {
         super(init);
         instance = this;
         this.config = this.withConfig("HungerConfig", EasyHungerConfig.CODEC);
+        this.foodsConfig = this.withConfig("Foods", FoodsConfig.CODEC);
+        this.drinksConfig = this.withConfig("Drinks", DrinksConfig.CODEC);
         this.biomeConfig = this.withConfig("BiomeModifiers", BiomeModifiersConfig.CODEC);
     }
 
@@ -42,7 +48,15 @@ public class EasyHunger extends JavaPlugin {
         super.setup();
 
         this.config.save();
+        
+        // Merge new default values without overwriting user customizations
+        boolean foodsChanged = this.foodsConfig.get().mergeDefaults();
+        boolean drinksChanged = this.drinksConfig.get().mergeDefaults();
+        
+        this.foodsConfig.save();
+        this.drinksConfig.save();
         this.biomeConfig.save();
+
 
         // register hunger component
         this.hungerComponentType = this.getEntityStoreRegistry()
@@ -144,6 +158,14 @@ public class EasyHunger extends JavaPlugin {
 
     public BiomeModifiersConfig getBiomeConfig() {
         return this.biomeConfig.get();
+    }
+
+    public FoodsConfig getFoodsConfig() {
+        return this.foodsConfig.get();
+    }
+
+    public DrinksConfig getDrinksConfig() {
+        return this.drinksConfig.get();
     }
 
     public static EasyHunger get() {

@@ -82,7 +82,7 @@ public class EasyHungerFoodHandler {
             }
 
             if (isFood) {
-                float hungerRestore = EasyHunger.get().getConfig().getFoodValue(itemId);
+                float hungerRestore = EasyHunger.get().getFoodsConfig().getFoodValue(itemId);
                 
                 if (hungerRestore > 0) {
                      try {
