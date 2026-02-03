@@ -62,12 +62,9 @@ public class ConsumeFoodInteraction extends SimpleInstantInteraction {
             if (hunger != null) {
                 float max = EasyHunger.get().getConfig().getMaxHunger();
                 if (hunger.getHungerLevel() < max) {
-                    // Get item ID from context
-                    String itemId = "unknown";
-                    com.hypixel.hytale.server.core.inventory.ItemStack heldItem = context.getHeldItem();
-                    if (heldItem != null) {
-                        itemId = heldItem.getItemId();
-                    }
+                    // Get item ID using getOriginalItemType() - always available even for last item in stack
+                    com.hypixel.hytale.server.core.asset.type.item.config.Item item = context.getOriginalItemType();
+                    String itemId = (item != null) ? item.getId() : "unknown";
                     
                     // Check config for this item's value, fallback to JSON value
                     float restoreAmount = EasyHunger.get().getFoodsConfig().getFoodValue(itemId);
