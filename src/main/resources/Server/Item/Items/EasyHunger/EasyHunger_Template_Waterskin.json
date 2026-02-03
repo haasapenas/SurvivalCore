@@ -8,22 +8,6 @@
         "Items.Potions"
     ],
     "Icon": "Icons/ItemsGenerated/Potion_Empty.png",
-    "Recipe": {
-        "Input": [
-            {
-                "ResourceTypeId": "Sands",
-                "Quantity": 1
-            }
-        ],
-        "BenchRequirement": [
-            {
-                "Type": "Processing",
-                "Id": "Furnace"
-            }
-        ],
-        "OutputQuantity": 1,
-        "TimeSeconds": 10
-    },
     "Interactions": {
         "Primary": "Block_Primary",
         "Secondary": "Block_Secondary"

@@ -33,7 +33,22 @@ public class HungerProtectionUtils {
     }
 
     public static boolean isSafe(PlayerRef player) {
-        return isSafe(player, "default");
+        // Try to get world name from player via reflection
+        String worldName = "default";
+        try {
+            // Try multiple paths to get world name
+            // Path 1: player.getWorld().getName() using pure reflection
+            Method getWorldMethod = player.getClass().getMethod("getWorld");
+            Object world = getWorldMethod.invoke(player);
+            if (world != null) {
+                Method getNameMethod = world.getClass().getMethod("getName");
+                worldName = (String) getNameMethod.invoke(world);
+            }
+        } catch (Exception e) {
+            // Fallback to default - log once for debugging
+            // log("Could not get world name: " + e.getClass().getSimpleName());
+        }
+        return isSafe(player, worldName);
     }
 
     public static boolean isSafe(PlayerRef player, String worldName) {
@@ -69,7 +84,7 @@ public class HungerProtectionUtils {
     }
 
     private static boolean checkSafety(PlayerRef player, String worldName) {
-        if (isEssentialsSpawnProtected(player)) return true;
+        if (isEssentialsSpawnProtected(player, worldName)) return true;
         if (isSafeAreasProtected(player, worldName)) return true;
         return false;
     }
@@ -176,7 +191,7 @@ public class HungerProtectionUtils {
         System.out.println("[EasyHunger-Protection] " + message);
     }
 
-    private static boolean isEssentialsSpawnProtected(PlayerRef player) {
+    private static boolean isEssentialsSpawnProtected(PlayerRef player, String worldName) {
         try {
             if (!essentialsChecked) {
                 try {
@@ -191,9 +206,9 @@ public class HungerProtectionUtils {
                         spawnProtectionManager = spmField.get(essentialsInstance);
                         
                         if (spawnProtectionManager != null) {
-                            // Method: boolean isInProtectedArea(@Nonnull Vector3d entityPos)
-                             isInProtectedAreaMethod = spawnProtectionManager.getClass().getMethod("isInProtectedArea", Vector3d.class);
-                             log("Essentials SpawnProtectionManager found!");
+                            // New signature in Essentials 1.8.0: boolean isInProtectedArea(String worldName, Vector3d entityPos)
+                            isInProtectedAreaMethod = spawnProtectionManager.getClass().getMethod("isInProtectedArea", String.class, Vector3d.class);
+                            log("Essentials SpawnProtectionManager found! (v1.8.0+ signature)");
                         } else {
                              log("Essentials SpawnProtectionManager is NULL");
                         }
@@ -216,13 +231,29 @@ public class HungerProtectionUtils {
 			// Get position
             Vector3d pos = player.getTransform().getPosition();
             
-            // log("Checking Essentials protection at " + pos);
-            
-            boolean result = (boolean) isInProtectedAreaMethod.invoke(spawnProtectionManager, pos);
-            if (result) {
-                // Only log when it works to reduce spam, or use debug flag
-                // log("Essentials protection active for player at " + pos);
+            // Get spawn's world name from storageManager
+            String spawnWorldName = worldName; // fallback
+            try {
+                Class<?> essentialsClass = Class.forName("com.nhulston.essentials.Essentials");
+                Method getInstanceMethod = essentialsClass.getMethod("getInstance");
+                Object essentials = getInstanceMethod.invoke(null);
+                
+                java.lang.reflect.Field storageField = essentialsClass.getDeclaredField("storageManager");
+                storageField.setAccessible(true);
+                Object storageManager = storageField.get(essentials);
+                
+                Method getSpawnMethod = storageManager.getClass().getMethod("getSpawn");
+                Object spawn = getSpawnMethod.invoke(storageManager);
+                
+                if (spawn != null) {
+                    Method getWorldMethod = spawn.getClass().getMethod("getWorld");
+                    spawnWorldName = (String) getWorldMethod.invoke(spawn);
+                }
+            } catch (Exception e) {
+                // Use fallback worldName
             }
+            
+            boolean result = (boolean) isInProtectedAreaMethod.invoke(spawnProtectionManager, spawnWorldName, pos);
             return result;
 
         } catch (Throwable e) {
