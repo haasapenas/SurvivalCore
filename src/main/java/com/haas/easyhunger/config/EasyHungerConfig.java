@@ -138,6 +138,32 @@ public class EasyHungerConfig {
     public boolean isWellFedEnabled() { return wellFedEnabled; }
     public float getWellFedThreshold() { return wellFedThreshold; }
 
+    // ===================== SETTERS =====================
+    
+    // Hunger setters
+    public void setMaxHunger(int value) { this.maxHunger = value; }
+    public void setStarvationTickRate(float value) { this.starvationTickRate = value; }
+    public void setStarvationPerTick(float value) { this.starvationPerTick = value; }
+    public void setStarvationStaminaModifier(float value) { this.starvationStaminaModifier = value; }
+    public void setHungryThreshold(float value) { this.hungryThreshold = value; }
+    public void setStarvationDamage(float value) { this.starvationDamage = value; }
+    public void setBlockBreakHungerCost(float value) { this.blockBreakHungerCost = value; }
+    public void setJumpHungerCost(float value) { this.jumpHungerCost = value; }
+    
+    // Thirst setters
+    public void setThirstEnabled(boolean value) { this.thirstEnabled = value; }
+    public void setMaxThirst(int value) { this.maxThirst = value; }
+    public void setThirstDecayRate(float value) { this.thirstDecayRate = value; }
+    public void setSprintThirstMultiplier(float value) { this.sprintThirstMultiplier = value; }
+    public void setThirstDamage(float value) { this.thirstDamage = value; }
+    public void setThirstyThreshold(float value) { this.thirstyThreshold = value; }
+    
+    // Other setters
+    public void setHudPosition(HudPosition value) { this.hudPosition = value; }
+    public void setPauseWhileSleeping(boolean value) { this.pauseWhileSleeping = value; }
+    public void setWellFedEnabled(boolean value) { this.wellFedEnabled = value; }
+    public void setWellFedThreshold(float value) { this.wellFedThreshold = value; }
+
 }
 
 

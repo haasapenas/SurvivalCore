@@ -335,7 +335,13 @@ public class FoodsConfig {
     }
     
     public void setFoodValue(String foodId, float value) {
-        foodValues.put(foodId, value);
+        try {
+            foodValues.put(foodId, value);
+        } catch (UnsupportedOperationException e) {
+            // Map is unmodifiable, create a mutable copy
+            foodValues = new HashMap<>(foodValues);
+            foodValues.put(foodId, value);
+        }
     }
     
     /**

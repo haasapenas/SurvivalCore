@@ -29,35 +29,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class StarveSystem extends EntityTickingSystem<EntityStore> {
-    private final float starvationTickRate;
-    private final float starvationPerTick;
-    private final float starvationDamage;
-    private final float starvationStaminaModifier;
-    private final float hungryThreshold;
 
-    private StarveSystem(
-        float starvationTickRate,
-        float starvationPerTick,
-        float starvationDamage,
-        float starvationStaminaModifier,
-        float hungryThreshold
-    ) {
-        this.starvationTickRate = starvationTickRate;
-        this.starvationPerTick = starvationPerTick;
-        this.starvationDamage = starvationDamage;
-        this.starvationStaminaModifier = starvationStaminaModifier;
-        this.hungryThreshold = hungryThreshold;
+    private StarveSystem() {
+        // Empty constructor - we read config dynamically each tick
     }
 
     public static StarveSystem create () {
-        EasyHungerConfig conf = EasyHunger.get().getConfig();
-        return new StarveSystem(
-            conf.getStarvationTickRate(),
-            conf.getStarvationPerTick(),
-            conf.getStarvationDamage(),
-            conf.getStarvationStaminaModifier(),
-            conf.getHungryThreshold()
-        );
+        return new StarveSystem();
     }
 
     @Nullable
@@ -93,7 +71,7 @@ public class StarveSystem extends EntityTickingSystem<EntityStore> {
 
         hunger.setStaminaSeen(getStaminaValue(entityStatMap));
         hunger.addElapsedTime(dt);
-        if (hunger.getElapsedTime() < this.starvationTickRate) return;
+        if (hunger.getElapsedTime() < EasyHunger.get().getConfig().getStarvationTickRate()) return;
         hunger.resetElapsedTime();
 
         float lowestStaminaSeen = hunger.getAndResetLowestStaminaSeen();
@@ -116,7 +94,7 @@ public class StarveSystem extends EntityTickingSystem<EntityStore> {
             return;
         }
         
-        float staminaModifier = ((10.0f - lowestStaminaSeen) / 10.0f) * this.starvationStaminaModifier;
+        float staminaModifier = ((10.0f - lowestStaminaSeen) / 10.0f) * EasyHunger.get().getConfig().getStarvationStaminaModifier();
         
         // Apply biome multiplier
         float biomeMultiplier = 1.0f;
@@ -127,13 +105,13 @@ public class StarveSystem extends EntityTickingSystem<EntityStore> {
             biomeMultiplier = EasyHunger.get().getBiomeConfig().getHungerMultiplier(biomeName);
         }
         
-        hunger.starve((this.starvationPerTick + staminaModifier) * biomeMultiplier);
+        hunger.starve((EasyHunger.get().getConfig().getStarvationPerTick() + staminaModifier) * biomeMultiplier);
 
         float hungerLevel = hunger.getHungerLevel();
         Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
 
         // Apply hungry effect when hunger level is below 20 (only if not already applied)
-        if (hungerLevel != 0 && hungerLevel < this.hungryThreshold) {
+        if (hungerLevel != 0 && hungerLevel < EasyHunger.get().getConfig().getHungryThreshold()) {
             EffectControllerComponent effectController = commandBuffer.getComponent(ref, EffectControllerComponent.getComponentType());
             if (effectController == null) return;
             
@@ -157,12 +135,12 @@ public class StarveSystem extends EntityTickingSystem<EntityStore> {
                 effectController.addEffect(ref, starvingEffect, commandBuffer);
             }
             // apply starvation damage
-            Damage damage = new Damage(Damage.NULL_SOURCE, EasyHungerUtils.getStarvationDamageCause(), this.starvationDamage);
+            Damage damage = new Damage(Damage.NULL_SOURCE, EasyHungerUtils.getStarvationDamageCause(), EasyHunger.get().getConfig().getStarvationDamage());
             DamageSystems.executeDamage(ref, commandBuffer, damage);
         }
         
         // Remove effects if hunger is sufficient
-        else if (hungerLevel >= this.hungryThreshold) {
+        else if (hungerLevel >= EasyHunger.get().getConfig().getHungryThreshold()) {
               EffectControllerComponent effectController = commandBuffer.getComponent(ref, EffectControllerComponent.getComponentType());
               if (effectController != null) {
                   EasyHungerUtils.removeHungerRelatedEffectsFromEntity(ref, commandBuffer, effectController);

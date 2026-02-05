@@ -28,24 +28,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class EasyThirstSystem extends EntityTickingSystem<EntityStore> {
-    private final float thirstDecayAmount;
-    private final float tickRate;
-    private final float thirstDamage;
 
-    private EasyThirstSystem(float thirstDecayAmount, float tickRate, float thirstDamage) {
-        this.thirstDecayAmount = thirstDecayAmount;
-        this.tickRate = tickRate;
-        this.thirstDamage = thirstDamage;
+    private EasyThirstSystem() {
+        // Empty constructor - we read config dynamically each tick
     }
 
     public static EasyThirstSystem create() {
-        EasyHungerConfig conf = EasyHunger.get().getConfig();
-        // Use ThirstDecayRate as amount to remove. Reuse StarvationTickRate for frequency.
-        return new EasyThirstSystem(
-            conf.getThirstDecayRate(),
-            conf.getStarvationTickRate(),
-            conf.getThirstDamage()
-        );
+        return new EasyThirstSystem();
     }
 
     @Nullable
@@ -82,13 +71,13 @@ public class EasyThirstSystem extends EntityTickingSystem<EntityStore> {
         if (thirst == null) return;
 
         thirst.addElapsedTime(dt);
-        if (thirst.getElapsedTime() < this.tickRate) return;
+        if (thirst.getElapsedTime() < EasyHunger.get().getConfig().getStarvationTickRate()) return;
         thirst.resetElapsedTime();
         
         
         Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
 
-        float finalDecay = this.thirstDecayAmount;
+        float finalDecay = EasyHunger.get().getConfig().getThirstDecayRate();
         MovementStatesComponent movementComp = archetypeChunk.getComponent(index, MovementStatesComponent.getComponentType());
         if (movementComp != null) {
              MovementStates states = movementComp.getMovementStates();
@@ -143,7 +132,7 @@ public class EasyThirstSystem extends EntityTickingSystem<EntityStore> {
             if (effectController != null && !EasyHungerUtils.activeEntityEffectIsDehydrated(effectController)) {
                 effectController.addEffect(ref, EasyHungerUtils.getDehydratedEntityEffect(), commandBuffer);
             }
-            Damage damage = new Damage(Damage.NULL_SOURCE, EasyHungerUtils.getThirstDamageCause(), this.thirstDamage);
+            Damage damage = new Damage(Damage.NULL_SOURCE, EasyHungerUtils.getThirstDamageCause(), EasyHunger.get().getConfig().getThirstDamage());
             DamageSystems.executeDamage(ref, commandBuffer, damage);
         }
         // Remove effects if thirst is sufficient

@@ -110,10 +110,8 @@ public class EasyHunger extends JavaPlugin {
         // register admin commands
         this.getCommandRegistry().registerCommand(new SetHungerCommand());
         this.getCommandRegistry().registerCommand(new com.haas.easyhunger.commands.SetThirstCommand());
+        this.getCommandRegistry().registerCommand(new com.haas.easyhunger.commands.EasyHungerValuesCommand());
 
-        // register admin commands
-        this.getCommandRegistry().registerCommand(new SetHungerCommand());
-        this.getCommandRegistry().registerCommand(new com.haas.easyhunger.commands.SetThirstCommand());
 
         // Try to prune recipes immediately, but also plan for a delayed pruning if needed
         this.pruneRecipes();
@@ -152,6 +150,21 @@ public class EasyHunger extends JavaPlugin {
 
     public void saveConfig() {
         this.config.save();
+    }
+
+    public void saveFoodsConfig() {
+        this.foodsConfig.save();
+    }
+
+    public void saveDrinksConfig() {
+        this.drinksConfig.save();
+    }
+
+    public void saveAllConfigs() {
+        this.config.save();
+        this.foodsConfig.save();
+        this.drinksConfig.save();
+        this.biomeConfig.save();
     }
 
     public ComponentType<EntityStore, HungerComponent> getHungerComponentType() {

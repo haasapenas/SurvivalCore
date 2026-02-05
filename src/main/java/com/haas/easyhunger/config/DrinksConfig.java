@@ -134,7 +134,13 @@ public class DrinksConfig {
     }
     
     public void setDrinkValue(String drinkId, float value) {
-        drinkValues.put(drinkId, value);
+        try {
+            drinkValues.put(drinkId, value);
+        } catch (UnsupportedOperationException e) {
+            // Map is unmodifiable, create a mutable copy
+            drinkValues = new HashMap<>(drinkValues);
+            drinkValues.put(drinkId, value);
+        }
     }
     
     /**

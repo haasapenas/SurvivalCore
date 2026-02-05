@@ -8,7 +8,6 @@ import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredAr
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
-import com.hypixel.hytale.server.core.permissions.HytalePermissions;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -17,11 +16,12 @@ import com.haas.easyhunger.ui.EasyHungerHud;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 public class SetHungerCommand extends AbstractPlayerCommand {
+    public static final String requiredPermission = "easyhunger.hunger.set.self";
     private final RequiredArg<Float> hungerLevel = this.withRequiredArg("hungerLevel", "A value between 0 and 100", ArgTypes.FLOAT);
 
     public SetHungerCommand() {
         super("hset", "Set own hunger level", false);
-        this.requirePermission(HytalePermissions.fromCommand("hset.me"));
+        this.requirePermission(requiredPermission);
         this.addUsageVariant(new SetHungerOtherCommand());
     }
 
@@ -60,12 +60,13 @@ public class SetHungerCommand extends AbstractPlayerCommand {
     }
 
     private static class SetHungerOtherCommand extends CommandBase {
+        public static final String requiredPermission = "easyhunger.hunger.set.other";
         private final RequiredArg<PlayerRef> playerArg = this.withRequiredArg("player", "The target player", ArgTypes.PLAYER_REF);
         private final RequiredArg<Float> hungerLevel = this.withRequiredArg("hungerLevel", "A value between 0 and 100", ArgTypes.FLOAT);
 
         public SetHungerOtherCommand() {
             super("Set another player's hunger level");
-            this.requirePermission(HytalePermissions.fromCommand("hset.other"));
+            this.requirePermission(requiredPermission);
         }
 
         @Override

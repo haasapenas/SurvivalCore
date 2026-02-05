@@ -8,7 +8,6 @@ import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredAr
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
-import com.hypixel.hytale.server.core.permissions.HytalePermissions;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -17,11 +16,12 @@ import com.haas.easyhunger.ui.EasyWaterHud;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 public class SetThirstCommand extends AbstractPlayerCommand {
+    public static final String requiredPermission = "easyhunger.thirst.set.self";
     private final RequiredArg<Float> thirstLevel = this.withRequiredArg("thirstLevel", "A value between 0 and 100", ArgTypes.FLOAT);
 
     public SetThirstCommand() {
         super("wset", "Set own thirst/water level", false);
-        this.requirePermission(HytalePermissions.fromCommand("wset.me"));
+        this.requirePermission(requiredPermission);
         this.addUsageVariant(new SetThirstOtherCommand());
     }
 
@@ -60,12 +60,13 @@ public class SetThirstCommand extends AbstractPlayerCommand {
     }
 
     private static class SetThirstOtherCommand extends CommandBase {
+        public static final String requiredPermission = "easyhunger.thirst.set.other";
         private final RequiredArg<PlayerRef> playerArg = this.withRequiredArg("player", "The target player", ArgTypes.PLAYER_REF);
         private final RequiredArg<Float> thirstLevel = this.withRequiredArg("thirstLevel", "A value between 0 and 100", ArgTypes.FLOAT);
 
         public SetThirstOtherCommand() {
             super("Set another player's thirst level");
-            this.requirePermission(HytalePermissions.fromCommand("wset.other"));
+            this.requirePermission(requiredPermission);
         }
 
         @Override
