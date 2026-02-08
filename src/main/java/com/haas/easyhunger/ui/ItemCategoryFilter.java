@@ -18,6 +18,7 @@ public class ItemCategoryFilter {
     public static final String CHEFF = "cheff";
     public static final String GALORE = "galore";
     public static final String CONNOR = "connor";
+    public static final String CABA = "caba";
     public static final String OTHER = "other";
     
     // HiddensHarvestDelights - exact item IDs from mod files
@@ -201,6 +202,15 @@ public class ItemCategoryFilter {
         CONNOR_ITEMS.add("Food_Salad_Corn");
     }
     
+    // Caba's Artisan Harvest - Wines
+    private static final Set<String> CABA_ITEMS = new HashSet<>();
+    static {
+        CABA_ITEMS.add("Azure_Fruit_Wine");
+        CABA_ITEMS.add("Pink_Berry_Wine");
+        CABA_ITEMS.add("Wild_Berry_Wine");
+        CABA_ITEMS.add("Wine_Mango");
+    }
+    
     /**
      * Gets the category for an item based on its ID.
      * @param itemId The item ID to categorize
@@ -231,6 +241,11 @@ public class ItemCategoryFilter {
         // Check exact CONNOR items
         if (CONNOR_ITEMS.contains(itemId)) {
             return CONNOR;
+        }
+        
+        // Check exact CABA items (Caba's Artisan Harvest)
+        if (CABA_ITEMS.contains(itemId)) {
+            return CABA;
         }
         
         // NoCube items

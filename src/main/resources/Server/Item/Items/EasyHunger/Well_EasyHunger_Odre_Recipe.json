@@ -15,6 +15,10 @@
             {
                 "Type": "Processing",
                 "Id": "Bench_Sink"
+            },
+            {
+                "Type": "Processing",
+                "Id": "Well_Process"
             }
         ],
         "Input": [

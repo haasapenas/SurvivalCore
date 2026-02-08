@@ -112,6 +112,12 @@ public class DrinksConfig {
         // AndiemgCheff - Drinks
         drinkValues.put("AndiemgCheff_Food_Sake", 35.0f);
         drinkValues.put("AndiemgCheff_Food_BubbleTea", 22.0f);
+        
+        // Caba's Artisan Harvest - Wines
+        drinkValues.put("Azure_Fruit_Wine", 35.0f);
+        drinkValues.put("Pink_Berry_Wine", 32.0f);
+        drinkValues.put("Wild_Berry_Wine", 30.0f);
+        drinkValues.put("Wine_Mango", 40.0f);
     }
     
     public Map<String, Float> getDrinkValues() { return drinkValues; }
